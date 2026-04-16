@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goobo-Market – Premium E-commerce</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FFC107%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-family=%22Outfit,sans-serif%22 font-size=%2270%22 font-weight=%22900%22 fill=%22black%22>G</text></svg>">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+    
+    <header>
+        <div class="container navbar-content">
+            <a href="/home.html" class="logo">
+                <span>G</span> GOOBO-MARKET
+            </a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="/home.html">Home</a></li>
+                    <li><a href="/home.html#categories">Collections</a></li>
+                    <li><a href="/home.html#products">Shop</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <a href="/cart.html" class="btn btn-outline"><i class="fas fa-shopping-cart"></i> <span>Cart</span></a>
+                <a href="/signin.html" class="btn btn-accent"><span>Sign In</span></a>
+                <button id="menu-toggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero rv">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <span class="hero-tag">Premium Experience</span>
+            <h1>Quality Items<br><span class="accent-text">For Every Day.</span></h1>
+            <p>Welcome to our curated marketplace. Discover the best in class products delivered right to your doorstep.</p>
+            <div class="hero-btns">
+                <a href="#categories" class="btn btn-accent">Discover Collections <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features container">
+        <div class="feature-item rv">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Secure Service</h3>
+            <p>Your transactions are safe with our encrypted payment systems.</p>
+        </div>
+        <div class="feature-item rv" style="transition-delay: 100ms;">
+            <i class="fas fa-bolt"></i>
+            <h3>Fast Delivery</h3>
+            <p>Experience lightning-fast shipping on all domestic orders.</p>
+        </div>
+        <div class="feature-item rv" style="transition-delay: 200ms;">
+            <i class="fas fa-award"></i>
+            <h3>Premium Quality</h3>
+            <p>We only source products from the most reputable manufacturers.</p>
+        </div>
+    </section>
+
+    <section id="categories" class="categories-section">
+        <div class="container">
+            <div class="section-header rv">
+                <h2>Our Categories</h2>
+                <p>Explore our wide range of premium goods designed for you.</p>
+            </div>
+            <div id="categories-grid" class="grid">
+                
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Goobo-Market. Simple. Fast. Best. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/auth.js"></script>
+    <script src="/js/navbar.js"></script>
+    <script src="/store.js"></script>
+</body>
+</html>
