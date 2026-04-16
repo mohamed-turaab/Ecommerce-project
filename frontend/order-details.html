@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details – Goobo-Market</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FFC107%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-family=%22Outfit,sans-serif%22 font-size=%2270%22 font-weight=%22900%22 fill=%22black%22>G</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/shared.css">
+</head>
+<body class="bg-dark text-light">
+    <header>
+        <div class="container navbar-content">
+            <a href="/home" class="logo"><span>G</span> GOOBO-MARKET</a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/home#categories">Collections</a></li>
+                    <li><a href="/home#products">Shop</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <a href="/cart" class="btn btn-outline"><i class="fas fa-shopping-cart"></i> <span>Cart</span></a>
+                <button id="menu-toggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container py-5" style="margin-top: 5rem; max-width: 800px;">
+        <div id="order-loading" style="text-align: center; padding: 5rem 0;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+        </div>
+
+        <div id="order-error" style="display: none; text-align: center; padding: 5rem 0;">
+            <p>Order not found.</p>
+            <a href="/home" class="btn btn-accent" style="margin-top: 2rem;">Back Home</a>
+        </div>
+
+        <div id="order-content" style="display: none;">
+            <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 2rem; margin-bottom: 3rem;">
+                <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;" id="order-id-label">#...</h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem;" id="order-date"></p>
+                <div id="status-badges" style="margin-top: 1rem; display: flex; gap: 0.5rem;"></div>
+            </div>
+
+            <div id="order-items-list" style="margin-bottom: 3rem;"></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-bottom: 3rem; border-top: 1px solid var(--border-color); pt-3rem; padding-top: 3rem;">
+                <div>
+                    <h4 style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 1rem;">Shipping</h4>
+                    <div id="shipping-details" style="font-weight: 500;"></div>
+                </div>
+                <div>
+                    <h4 style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 1rem;">Payment</h4>
+                    <p id="payment-method-val" style="font-weight: 500; text-transform: capitalize;"></p>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 2.5rem; border-radius: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <span style="color: var(--text-muted);">Subtotal</span>
+                    <span id="subtotal-val"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <span style="color: var(--text-muted);">Shipping</span>
+                    <span id="shipping-val"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); font-weight: 900; font-size: 1.5rem;">
+                    <span>Total</span>
+                    <span id="total-val" class="accent-text"></span>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 4rem;">
+                <a href="/home" class="btn btn-outline" style="border-color: transparent;">Back to shopping</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="/auth.js"></script>
+    <script src="/js/navbar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (!id) { showError(); return; }
+
+            try {
+                const res = await fetch(`/api/orders/${id}`);
+                if (!res.ok) throw new Error();
+                const { data } = await res.json();
+                render(data.order);
+            } catch (err) { showError(); }
+        });
+
+        function render(order) {
+            document.getElementById('order-loading').style.display = 'none';
+            document.getElementById('order-content').style.display = 'block';
+
+            document.getElementById('order-id-label').innerText = `#${order._id.slice(-8).toUpperCase()}`;
+            document.getElementById('order-date').innerText = new Date(order.createdAt).toLocaleString();
+            
+            document.getElementById('status-badges').innerHTML = `
+                <span style="font-size: 0.7rem; font-weight: 900; padding: 4px 12px; border-radius: 50px; background: ${order.isPaid ? '#4CAF50' : '#ff5555'}; color: #000;">${order.isPaid ? 'PAID' : 'UNPAID'}</span>
+                <span style="font-size: 0.7rem; font-weight: 900; padding: 4px 12px; border-radius: 50px; background: var(--accent-color); color: #000;">${order.isDelivered ? 'DELIVERED' : 'PROCESSING'}</span>
+            `;
+
+            document.getElementById('order-items-list').innerHTML = order.orderItems.map(item => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <img src="${item.image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 10px;">
+                        <div>
+                            <h3 style="font-size: 1rem; font-weight: 700;">${item.name}</h3>
+                            <p style="color: var(--text-muted); font-size: 0.8rem;">Qty: ${item.quantity}</p>
+                        </div>
+                    </div>
+                    <div style="font-weight: 800;">$${(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('shipping-details').innerHTML = `<p>${order.shippingAddress.street}</p><p>${order.shippingAddress.city}, ${order.shippingAddress.country}</p>`;
+            document.getElementById('payment-method-val').innerText = order.paymentMethod.replace(/_/g, ' ');
+
+            document.getElementById('subtotal-val').innerText = `$${order.itemsPrice.toFixed(2)}`;
+            document.getElementById('shipping-val').innerText = order.shippingPrice === 0 ? 'FREE' : `$${order.shippingPrice.toFixed(2)}`;
+            document.getElementById('total-val').innerText = `$${order.totalPrice.toFixed(2)}`;
+        }
+
+        function showError() {
+            document.getElementById('order-loading').style.display = 'none';
+            document.getElementById('order-error').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

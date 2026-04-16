@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – Goobo-Market</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FFC107%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-family=%22Outfit,sans-serif%22 font-size=%2270%22 font-weight=%22900%22 fill=%22black%22>G</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        body { display: flex; min-height: 100vh; background: #000; overflow: hidden; }
+        .sidebar { 
+            width: 280px; 
+            background: rgba(5, 5, 5, 0.8); 
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color); 
+            padding: 2.5rem; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 3rem; 
+            position: fixed; 
+            height: 100vh; 
+            z-index: 100;
+        }
+        .main-content { margin-left: 280px; flex: 1; padding: 4rem; height: 100vh; overflow-y: auto; background: radial-gradient(circle at 50% 0%, rgba(255, 193, 7, 0.05) 0%, transparent 50%); }
+        .nav-item { display: flex; align-items: center; gap: 1rem; color: var(--text-muted); text-decoration: none; font-weight: 700; transition: all 0.3s; padding: 1rem; border-radius: 12px; cursor: pointer; border: none; background: transparent; width: 100%; text-align: left; }
+        .nav-item:hover, .nav-item.active { background: rgba(255, 255, 255, 0.05); color: #fff; }
+        .nav-item.active { color: var(--accent-color); border: 1px solid rgba(255, 193, 7, 0.2); }
+        
+        .form-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); z-index: 2000; align-items: center; justify-content: center; padding: 2rem; }
+        .modal-content { background: var(--surface-color); padding: 3rem; border-radius: 32px; width: 100%; max-width: 600px; border: 1px solid var(--border-color); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        
+        input, select, textarea { width: 100%; background: #000; border: 1px solid var(--border-color); padding: 1rem; border-radius: 12px; color: #fff; font-family: inherit; transition: border-color 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-color); outline: none; }
+    </style>
+</head>
+<body>
+    
+    <aside class="sidebar">
+        <a href="/" class="logo"><span>G</span> ADMIN</a>
+        <nav style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button class="nav-item active" onclick="showSection('products')"><i class="fas fa-box"></i> Products</button>
+            <button class="nav-item" onclick="showSection('users')"><i class="fas fa-users"></i> Users</button>
+            <button class="nav-item" onclick="showSection('orders')"><i class="fas fa-shopping-bag"></i> Orders</button>
+        </nav>
+        <button onclick="handleLogout()" class="btn btn-outline" style="margin-top: auto; justify-content: center;"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </aside>
+
+    <main class="main-content">
+        
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; background: transparent; border: none; backdrop-filter: none; padding: 0;">
+            <div>
+                <h1 id="section-title" style="font-size: 3.5rem; font-weight: 950; letter-spacing: -2.5px; line-height: 1;">Inventory</h1>
+                <p id="section-desc" style="color: var(--text-muted); margin-top: 0.5rem;">Managing all products across your store.</p>
+            </div>
+            <button class="btn btn-accent" onclick="toggleModal(true)"><i class="fas fa-plus"></i> Add Product</button>
+        </header>
+
+        <div class="admin-stats">
+            <div class="stat-card">
+                <span class="stat-label">Total Products</span>
+                <div class="stat-value" id="stat-total-products">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Total Stock</span>
+                <div class="stat-value" id="stat-total-stock">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Low Stock items</span>
+                <div class="stat-value" id="stat-low-stock" style="color: #ff5555;">0</div>
+            </div>
+        </div>
+
+        <section id="section-products">
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Product Info</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock Status</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-product-body">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="section-users" style="display: none;">
+            <div class="stat-card" style="text-align: center; padding: 5rem;">
+                <i class="fas fa-users" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 2rem;"></i>
+                <h2>User Management</h2>
+                <p style="color: var(--text-muted);">This module is coming soon in the next update.</p>
+            </div>
+        </section>
+
+        <section id="section-orders" style="display: none;">
+            <div class="stat-card" style="text-align: center; padding: 5rem;">
+                <i class="fas fa-shopping-bag" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 2rem;"></i>
+                <h2>Order Tracking</h2>
+                <p style="color: var(--text-muted);">This module is coming soon in the next update.</p>
+            </div>
+        </section>
+    </main>
+
+    <div class="form-modal" id="product-modal">
+        <div class="modal-content">
+            <h2 style="font-size: 2.25rem; font-weight: 950; margin-bottom: 2rem; letter-spacing: -1px;">Add New Product</h2>
+            <form id="product-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div style="grid-column: 1 / -1;">
+                    <label style="font-weight: 800; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; display: block;">Product Title</label>
+                    <input type="text" id="p-name" placeholder="e.g. Premium Fragrance" required>
+                </div>
+                <div>
+                    <label style="font-weight: 800; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; display: block;">Price (USD)</label>
+                    <input type="number" id="p-price" step="0.01" placeholder="99.99" required>
+                </div>
+                <div>
+                    <label style="font-weight: 800; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; display: block;">Category</label>
+                    <select id="p-category" required>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Perfumes">Perfumes</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Home">Home</option>
+                        <option value="Supplements">Supplements</option>
+                        <option value="Sports">Sports</option>
+                    </select>
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="font-weight: 800; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; display: block;">Image Source (URL)</label>
+                    <input type="text" id="p-image" placeholder="https://images.unsplash.com/..." required>
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="font-weight: 800; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; display: block;">Description</label>
+                    <textarea id="p-desc" placeholder="Product details..." required style="height: 100px; resize: none;"></textarea>
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="font-weight: 800; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; display: block;">Inventory Stock</label>
+                    <input type="number" id="p-stock" value="10" required>
+                </div>
+                <div style="display: flex; gap: 1rem; grid-column: 1 / -1; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-accent" style="flex: 1; justify-content: center;">Create Product</button>
+                    <button type="button" class="btn btn-outline" onclick="toggleModal(false)" style="flex: 1; justify-content: center;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // Check if admin on load
+        async function verifyAdmin() {
+            const user = await checkAuthStatus();
+            if (!user || user.role !== 'admin') {
+                window.location.href = 'admin-login.html';
+            }
+            loadAdminProducts();
+        }
+
+        function showSection(name) {
+            document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
+            document.getElementById(`section-${name}`).style.display = 'block';
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const buttons = Array.from(document.querySelectorAll('.nav-item'));
+            const activeBtn = buttons.find(b => b.innerText.toLowerCase().includes(name));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Update title
+            const titles = { products: 'Inventory', users: 'Customers', orders: 'Recent Orders' };
+            const descs = { products: 'Managing all products across your store.', users: 'Manage your platform subscribers.', orders: 'Track and manage customer deliveries.' };
+            document.getElementById('section-title').innerText = titles[name];
+            document.getElementById('section-desc').innerText = descs[name];
+        }
+
+        function toggleModal(show) {
+            document.getElementById('product-modal').style.display = show ? 'flex' : 'none';
+        }
+
+        async function loadAdminProducts() {
+            const tbody = document.getElementById('admin-product-body');
+            try {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                const products = data.data.products;
+
+                // Update Stats
+                document.getElementById('stat-total-products').innerText = products.length;
+                const totalStock = products.reduce((acc, p) => acc + (p.countInStock || 0), 0);
+                document.getElementById('stat-total-stock').innerText = totalStock;
+                const lowStock = products.filter(p => (p.countInStock || 0) < 5).length;
+                document.getElementById('stat-low-stock').innerText = lowStock;
+
+                tbody.innerHTML = products.map(p => `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                                <img src="${p.image}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-color);">
+                                <div>
+                                    <div style="font-weight: 800; font-size: 1rem;">${p.name}</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">ID: ${p._id.slice(-8)}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-accent">${p.category}</span></td>
+                        <td><div style="font-weight: 800; color: #fff;">$${p.price.toFixed(2)}</div></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 8px; height: 8px; border-radius: 50%; background: ${p.countInStock > 0 ? '#4CAF50' : '#F44336'}"></div>
+                                <span style="font-weight: 800;">${p.countInStock || 0} in stock</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                <button onclick="deleteProduct('${p._id}')" class="action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { 
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 4rem; color: var(--text-muted);">Failed to load products.</td></tr>';
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Are you sure you want to remove this product?')) return;
+            try {
+                const res = await fetch(`/api/admin/products/${id}`, { 
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } // If needed
+                });
+                if (res.ok) {
+                    loadAdminProducts();
+                } else {
+                    alert('Action unauthorized or failed.');
+                }
+            } catch (e) { alert('Network error occurred.'); }
+        }
+
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            const payload = {
+                name: document.getElementById('p-name').value,
+                price: Number(document.getElementById('p-price').value),
+                category: document.getElementById('p-category').value,
+                description: document.getElementById('p-desc').value,
+                image: document.getElementById('p-image').value,
+                countInStock: Number(document.getElementById('p-stock').value)
+            };
+
+            try {
+                const res = await fetch('/api/admin/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    toggleModal(false);
+                    loadAdminProducts();
+                    e.target.reset();
+                } else {
+                    const data = await res.json();
+                    alert(data.message || 'Error adding product');
+                }
+            } catch (e) { alert('Server communication error.'); }
+            finally {
+                btn.innerHTML = 'Create Product';
+                btn.disabled = false;
+            }
+        });
+
+        window.onload = verifyAdmin;
+    </script>
+</body>
+</html>

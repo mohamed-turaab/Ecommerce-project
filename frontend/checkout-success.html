@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success – Goobo-Market</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FFC107%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-family=%22Outfit,sans-serif%22 font-size=%2270%22 font-weight=%22900%22 fill=%22black%22>G</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/shared.css">
+</head>
+<body class="bg-dark text-light">
+    
+    <header>
+        <div class="container navbar-content">
+            <a href="/home" class="logo"><span>G</span> GOOBO-MARKET</a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/home#categories">Collections</a></li>
+                    <li><a href="/home#products">Shop</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <button id="menu-toggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+        <div class="success-card rv show" style="text-align: center; width: 100%; max-width: 500px;">
+            <div style="color: #4CAF50; font-size: 5rem; margin-bottom: 2rem;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h1 style="font-size: 3rem; font-weight: 950; letter-spacing: -2px; margin-bottom: 3rem;">Order <span class="accent-text">Successful.</span></h1>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                <a id="view-order-btn" href="/order-details" class="btn btn-accent" style="width: 100%; padding: 1.25rem; justify-content: center;">VIEW ORDER</a>
+                <a href="/home" class="btn btn-outline" style="width: 100%; padding: 1.25rem; justify-content: center; border-color: transparent;">Continue Shopping</a>
+            </div>
+        </div>
+    </main>
+
+    <footer style="padding: 4rem 0; text-align: center; border-top: 1px solid var(--border-color);">
+        <p style="color: var(--text-dim); font-weight: 700;">&copy; 2025 Goobo-Market. Your Premium Shopping Destination.</p>
+    </footer>
+
+    <script src="/auth.js"></script>
+    <script src="/js/navbar.js"></script>
+    <script>
+        // Trigger animations and handle dynamic content
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof checkAuthStatus === 'function') checkAuthStatus();
+            
+            // Get the order ID from URL and update the button
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('id');
+            
+            if (orderId) {
+                // Update the "VIEW ORDER" button link
+                document.getElementById('view-order-btn').href = `/order-details?id=${orderId}`;
+            }
+
+            // Fix the order number display (keeping random for variety, or use real ID)
+            const randomDisplayId = Math.floor(Math.random() * 900000) + 100000;
+            document.getElementById('order-id-display').innerText = `#GBM-${randomDisplayId}`;
+        });
+    </script>
+</body>
+</html>

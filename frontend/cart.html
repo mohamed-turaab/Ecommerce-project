@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart – Goobo-Market</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FFC107%22/><text y=%22.9em%22 x=%2250%%22 text-anchor=%22middle%22 font-family=%22Outfit,sans-serif%22 font-size=%2270%22 font-weight=%22900%22 fill=%22black%22>G</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/shared.css">
+</head>
+<body class="bg-dark text-light">
+    
+    <header>
+        <div class="container navbar-content">
+            <a href="/" class="logo"><span>G</span> GOOBO-MARKET</a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/home#categories">Collections</a></li>
+                    <li><a href="/home#products">Shop</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <a href="/signin" class="btn btn-accent"><span>Sign In</span></a>
+                <button id="menu-toggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container py-5" style="margin-top: 5rem; min-height: 80vh;">
+        <div style="margin-bottom: 4rem;">
+            <span class="hero-tag">Order Summary</span>
+            <h1 style="font-size: 4.5rem; font-weight: 950; letter-spacing: -3px; line-height: 1;">Shopping <span class="accent-text">Cart</span></h1>
+            <p style="color: var(--text-muted); margin-top: 1rem; font-size: 1.1rem;">Review your items and proceed to checkout.</p>
+        </div>
+
+        <div id="cart-content" class="cart-grid" style="display: none;">
+            
+            <div id="cart-items-list">
+                
+            </div>
+
+            <div class="summary-card">
+                <h2 style="font-size: 2rem; font-weight: 950; margin-bottom: 2rem; letter-spacing: -1px;">Summary</h2>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal-val">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span style="color: #4CAF50;">FREE</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span id="total-val">$0.00</span>
+                </div>
+                <button class="btn btn-accent" style="width: 100%; justify-content: center; margin-top: 2.5rem; padding: 1.5rem; font-size: 1.1rem;" onclick="handleCheckout()">
+                    PROCEED TO CHECKOUT <i class="fas fa-arrow-right"></i>
+                </button>
+                <p style="text-align: center; color: var(--text-dim); font-size: 0.8rem; margin-top: 1.5rem; font-weight: 700;">
+                    <i class="fas fa-shield-alt"></i> Secure Checkout powered by Stripe
+                </p>
+            </div>
+        </div>
+
+        <div id="checkout-modal" class="modal-overlay">
+            <div class="modal-container">
+                <button class="modal-close" onclick="closeCheckoutModal()"><i class="fas fa-times"></i></button>
+                <span class="hero-tag" style="margin-bottom: 1rem;">Final Step</span>
+                <h2 style="font-size: 2.5rem; font-weight: 950; margin-bottom: 1rem; letter-spacing: -2px;">Shipping <span class="accent-text">Details</span></h2>
+                <p style="color: var(--text-muted); margin-bottom: 3rem;">Please provide your shipping address to finalize the order.</p>
+
+                <form id="shipping-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div style="grid-column: span 2;">
+                        <label class="form-label" style="font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">Street Address</label>
+                        <input type="text" id="street" required class="form-input" placeholder="e.g. 123 Main St">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">City</label>
+                        <input type="text" id="city" required class="form-input" placeholder="e.g. Mogadishu">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">Country</label>
+                        <input type="text" id="country" required class="form-input" placeholder="e.g. Somalia">
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label class="form-label" style="font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">Payment Method</label>
+                        <select id="paymentMethod" class="form-input">
+                            <option value="cash_on_delivery">Cash on Delivery</option>
+                            <option value="card">Credit / Debit Card</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-accent" style="grid-column: span 2; padding: 1.5rem; justify-content: center; margin-top: 1rem;" onclick="processFinalOrder(event)">
+                        PLACE ORDER NOW <i class="fas fa-check-circle"></i>
+                    </button>
+                </form>
+        </div>
+
+        <div id="cart-empty" style="background: var(--surface-color); border: 1px solid var(--border-color); padding: 8rem 2rem; border-radius: 40px; text-align: center; display: none;">
+            <div style="background: rgba(255,193,7,0.05); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 3rem;">
+                <i class="fas fa-shopping-bag" style="font-size: 3rem; color: var(--text-dim);"></i>
+            </div>
+            <h2 style="font-size: 2.5rem; font-weight: 950; margin-bottom: 1rem; letter-spacing: -1px;">Your cart is empty.</h2>
+            <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto 3rem; font-size: 1.1rem;">You haven't added anything to your cart yet.</p>
+            <a href="/home" class="btn btn-accent" style="padding: 1rem 3rem;">START SHOPPING</a>
+        </div>
+    </main>
+
+    <footer style="margin-top: 10rem; padding: 4rem 0; border-top: 1px solid var(--border-color); text-align: center;">
+        <div class="container">
+            <p style="color: var(--text-dim); font-weight: 700;">&copy; 2025 Goobo-Market. Your Premium Shopping Destination.</p>
+        </div>
+    </footer>
+
+    <script src="/auth.js"></script>
+    <script src="/js/navbar.js"></script>
+    <script>
+        async function renderCart() {
+            const user = await checkAuthStatus();
+            let cartItems = [];
+
+            if (user) {
+                const remoteCart = await getRemoteCart();
+                if (remoteCart) {
+                    cartItems = remoteCart.items.map(item => ({
+                        _id: item.product._id,
+                        name: item.product.name,
+                        price: item.price,
+                        image: item.product.images?.[0]?.url || item.product.image,
+                        qty: item.quantity
+                    }));
+                }
+            } else {
+                cartItems = getCart();
+            }
+
+            const list = document.getElementById('cart-items-list');
+            const content = document.getElementById('cart-content');
+            const empty = document.getElementById('cart-empty');
+
+            if (cartItems.length === 0) {
+                content.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            content.style.display = 'grid';
+
+            let subtotal = 0;
+            list.innerHTML = cartItems.map(item => {
+                const itemTotal = item.price * (item.qty || 1);
+                subtotal += itemTotal;
+                return `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400'">
+                        <div class="cart-item-info">
+                            <h3 class="cart-item-name">${item.name}</h3>
+                            <p style="color: var(--text-dim); font-size: 0.8rem; font-weight: 700;">PRODUCT ID: ${item._id.slice(-8)}</p>
+                            <div class="cart-qty-ctrl">
+                                <button class="qty-btn" onclick="updateQty('${item._id}', -1)"><i class="fas fa-minus"></i></button>
+                                <span style="font-weight: 900; width: 30px; text-align: center;">${item.qty || 1}</span>
+                                <button class="qty-btn" onclick="updateQty('${item._id}', 1)"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="cart-item-price">$${itemTotal.toFixed(2)}</div>
+                            <button onclick="handleRemove('${item._id}')" style="background: none; border: none; color: #ff5555; cursor: pointer; font-size: 0.85rem; font-weight: 800; margin-top: 1rem; text-transform: uppercase; letter-spacing: 1px;">Remove</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('subtotal-val').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('total-val').innerText = `$${subtotal.toFixed(2)}`;
+        }
+
+        async function updateQty(productId, delta) {
+            const user = await checkAuthStatus();
+            
+            if (user) {
+                // Sync with API
+                const cart = await getRemoteCart();
+                const item = cart.items.find(i => i.product._id === productId);
+                if (item) {
+                    const newQty = item.quantity + delta;
+                    if (newQty < 1) {
+                        await handleRemove(productId);
+                        return;
+                    }
+                    await fetch(`/api/cart/${productId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ quantity: newQty })
+                    });
+                }
+            } else {
+                // LocalStorage fallback
+                let cart = getCart();
+                const item = cart.find(i => i._id === productId);
+                if (item) {
+                    item.qty = (item.qty || 1) + delta;
+                    if (item.qty < 1) {
+                        handleRemove(productId);
+                        return;
+                    }
+                    saveCart(cart);
+                }
+            }
+            renderCart();
+        }
+
+        async function handleRemove(id) {
+            await removeFromCart(id);
+            renderCart();
+        }
+
+        async function handleCheckout() {
+            const user = await checkAuthStatus();
+            if (!user) {
+                alert('Please sign in to complete your purchase. You will be redirected back here after signing in.');
+                window.location.href = '/signin?redirect=/cart';
+                return;
+            }
+
+            // Open the checkout modal
+            document.getElementById('checkout-modal').classList.add('active');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.remove('active');
+        }
+
+        async function processFinalOrder(event) {
+            // Validate Shipping Form
+            const street = document.getElementById('street').value;
+            const city = document.getElementById('city').value;
+            const country = document.getElementById('country').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+
+            if (!street || !city || !country) {
+                alert('Fadlan buuxi macluumaadka dhoofinta (Please fill in shipping details).');
+                return;
+            }
+
+            // UI Feedback
+            const btn = event.currentTarget;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> FINALIZING ORDER...';
+            btn.disabled = true;
+
+            try {
+                // IMPORTANT: Push all local items to the server before creating order
+                await migrateCartToServer();
+                
+                const res = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        shippingAddress: { street, city, country },
+                        paymentMethod
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.removeItem('goobo_cart'); // Clear local as well
+                    // Pass the new order ID to the success page
+                    const orderId = data.data.order._id;
+                    window.location.href = `/checkout-success?id=${orderId}`;
+                } else {
+                    alert(data.message || 'Checkout failed. Please try again.');
+                    btn.innerHTML = original;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Checkout error:', err);
+                alert('An error occurred during checkout.');
+                btn.innerHTML = original;
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+</body>
+</html>
